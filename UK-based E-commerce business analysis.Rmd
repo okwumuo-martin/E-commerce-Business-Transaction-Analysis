@@ -1,0 +1,176 @@
+---
+title: "UK-Based E-Commerce Business Analysis"
+author: "Martin Okwumuo"
+date: "2026-01-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Summary
+
+- This analysis evaluates one year of sales transaction data from a UK-based online retail business specializing in gifts and home wares for adults and children. The dataset can be accessed through https://www.kaggle.com/datasets/gabrielramos87/an-online-shop-business. For the purpose of this analysis, the dataset was downloaded directly from kaggle. It includes approximately 500,000 transactions from customers across multiple countries, comprising both individual consumers and small businesses purchasing in bulk. After data cleaning to remove cancelled transactions and invalid records, key insights into sales performance, product demand, and customer profitability were identified.
+- The analysis shows that sales exhibit strong seasonality, with revenue increasing steadily toward the end of the year and peaking during the final months. This pattern is consistent with heightened consumer demand during holiday and festive periods, indicating that seasonal factors play a significant role in overall business performance.
+- Product-level analysis reveals that a small group of products accounts for a disproportionately large share of total units sold. These high-frequency items form the core of the retailer’s sales volume and present opportunities for product bundling, targeted promotions, and inventory optimization.
+- Transaction-level analysis indicates that most customers purchase a small number of items per transaction, reflecting typical consumer buying behavior. However, a notable portion of transactions involves large quantities, highlighting the presence of bulk-buying customers, likely small businesses or resellers.
+- Customer profitability analysis shows that UK-based customers generate the highest revenue, and that a relatively small number of customers contribute a significant share of total sales. These high-value customers represent a critical segment for revenue stability and growth.
+
+#Data preprocessing
+
+##Creating the target directory
+```{r, cache=TRUE}
+# Create directory
+dir.create("UK-Based_business_data", showWarnings = FALSE)
+# Download dataset using Kaggle CLI
+system(
+  "kaggle datasets download -d gabrielramos87/an-online-shop-business -p UK-Based_business_data --unzip"
+)
+```
+
+#Reading the dataset
+```{r, cache=TRUE}
+retail <- read.csv(
+  "UK-Based_business_data/Sales Transaction v.4a.csv",
+  stringsAsFactors = FALSE
+)
+
+str(retail)
+```
+
+#Loading the packages
+```{r}
+library(tidyverse)
+library(lubridate)
+library(knitr)
+library(ggplot2)
+library(scales)
+```
+
+#Data cleaning and preparation
+
+##This cleaning was done to Remove cancelled transactions, negative quantities, prices and Convert the Date to proper date format
+
+Create Revenue variable
+```{r, cache=TRUE}
+clean_retail <- retail %>%
+  filter(!grepl("^C", TransactionNo)) %>%   # Remove cancelled invoices
+  filter(Quantity > 0, Price > 0) %>%        # Remove negative values
+  mutate(
+    Date = as.Date(Date),
+    Month = floor_date(Date, "month"),
+    Revenue = Quantity * Price
+  )
+
+summary(clean_retail)
+```
+```{r}
+colnames(clean_retail)
+```
+
+#Sales trend over the month
+```{r monthly-sales, cache=TRUE}
+monthly_sales <- clean_retail %>%
+  group_by(Month) %>%
+  summarise(Total_Sales = sum(Revenue))
+
+monthly_sales
+```
+
+```{r}
+ggplot(monthly_sales, aes(Month, Total_Sales)) +
+  geom_line(color = "steelblue", linewidth = 1) +
+  geom_point() +
+  scale_y_continuous(
+    labels = scales::label_dollar(prefix = "£")
+  ) +
+  labs(
+    title = "Monthly Sales Trend",
+    x = "Month",
+    y = "Total Sales (£)"
+  ) +
+  theme_minimal()
+```
+
+#Checking for most frequently purchased product
+```{r top-products, cache=TRUE}
+top_products <- clean_retail %>%
+  group_by(ProductName) %>%
+  summarise(Total_Quantity = sum(Quantity)) %>%
+  arrange(desc(Total_Quantity)) %>%
+  slice_head(n = 10)
+
+kable(top_products)
+```
+
+```{r}
+ggplot(top_products, aes(reorder(ProductName, Total_Quantity), Total_Quantity)) +
+  geom_col(fill = "darkgreen") +
+  coord_flip() +
+  labs(
+    title = "Top 10 Most Frequently Purchased Products",
+    x = "ProductName",
+    y = "Total Quantity Purchased"
+  ) +
+  theme_minimal()
+```
+
+#Checking for number of products purcased per transaction
+```{r products-per-transaction}
+transaction_items <- clean_retail %>%
+  group_by(TransactionNo) %>%
+  summarise(Total_Items = sum(Quantity))
+
+summary(transaction_items$Total_Items)
+```
+
+```{r}
+ggplot(transaction_items, aes(Total_Items)) +
+  geom_histogram(bins = 50, fill = "orange", color = "black") +
+  labs(
+    title = "Distribution of Products Purchased Per Transaction",
+    x = "Number of Items",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+```
+
+#Most profitable customer segment
+
+##Profit by country
+```{r profit-country, cache=TRUE}
+country_profit <- clean_retail %>%
+  group_by(Country) %>%
+  summarise(Total_Revenue = sum(Revenue)) %>%
+  arrange(desc(Total_Revenue))
+
+kable(head(country_profit, 10))
+```
+
+##Profit by Customer
+```{r}
+customer_profit <- clean_retail %>%
+  group_by(CustomerNo) %>%
+  summarise(Total_Revenue = sum(Revenue)) %>%
+  arrange(desc(Total_Revenue))
+
+kable(head(customer_profit, 10))
+```
+
+#Conclusion and Recommendation
+
+##Conclusion
+
+This analysis reveals Strong seasonality in sales with strong growth towards end of the year probably as a result of holiday gifting, Clear best-selling products, Distinct customer segments and Opportunities to increase profit through targeted marketing, bundling, and customer retention.
+UK-based customers contribute the highest revenue. A small number of customers generate very high lifetime value likely bulk buyers or retailers.
+A small group of products accounts for a large share of sales volume. These products are ideal for bundling, promotions, and stock prioritization.
+
+##Business Recommendations
+
+1. Focus on High-Value Customers; Introduction of loyalty programs for top-spending customers. Offering volume discounts for bulk buyers. 
+2. Optimize Product Strategy; Bundle top-selling products. Ensure high-demand items are always in stock.
+3. Seasonal Marketing; Increase advertising and promotions during high-sales months especially towards th end of the year. Launching gift-themed campaigns before holidays. 
+4. International Expansion; Target high-performing non-UK countries with localized shipping and marketing. 
+5. Reduce Cancellations; Improve order confirmation and payment validation to reduce negative quantities and cancellations.
+
