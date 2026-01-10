@@ -11,11 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #Summary
 
-- This analysis evaluates one year of sales transaction data from a UK-based online retail business specializing in gifts and home wares for adults and children. The dataset can be accessed through https://www.kaggle.com/datasets/gabrielramos87/an-online-shop-business. For the purpose of this analysis, the dataset was downloaded directly from kaggle. It includes approximately 500,000 transactions from customers across multiple countries, comprising both individual consumers and small businesses purchasing in bulk. After data cleaning to remove cancelled transactions and invalid records, key insights into sales performance, product demand, and customer profitability were identified.
-- The analysis shows that sales exhibit strong seasonality, with revenue increasing steadily toward the end of the year and peaking during the final months. This pattern is consistent with heightened consumer demand during holiday and festive periods, indicating that seasonal factors play a significant role in overall business performance.
-- Product-level analysis reveals that a small group of products accounts for a disproportionately large share of total units sold. These high-frequency items form the core of the retailer’s sales volume and present opportunities for product bundling, targeted promotions, and inventory optimization.
-- Transaction-level analysis indicates that most customers purchase a small number of items per transaction, reflecting typical consumer buying behavior. However, a notable portion of transactions involves large quantities, highlighting the presence of bulk-buying customers, likely small businesses or resellers.
-- Customer profitability analysis shows that UK-based customers generate the highest revenue, and that a relatively small number of customers contribute a significant share of total sales. These high-value customers represent a critical segment for revenue stability and growth.
+- This analysis evaluates one year of sales transaction data from a UK-based online retail business specializing in gifts and home wares for adults and children. The dataset can be accessed through https://www.kaggle.com/datasets/gabrielramos87/an-online-shop-business. For the purpose of this analysis, the dataset was downloaded directly from kaggle. It includes approximately 500,000 transactions from customers across multiple countries, comprising both individual consumers and small businesses purchasing in bulk.
+The analysis was carried out to reveal how the sales trend over the months, the most frequently purchased products, how many products the customer purchase in each transaction and the most profitable segment customers.The insights gained from the analysis will help with recommendations on how to make the business more profitable.
 
 #Data preprocessing
 
@@ -162,9 +159,11 @@ kable(head(customer_profit, 10))
 
 ##Conclusion
 
-This analysis reveals Strong seasonality in sales with strong growth towards end of the year probably as a result of holiday gifting, Clear best-selling products, Distinct customer segments and Opportunities to increase profit through targeted marketing, bundling, and customer retention.
-UK-based customers contribute the highest revenue. A small number of customers generate very high lifetime value likely bulk buyers or retailers.
-A small group of products accounts for a large share of sales volume. These products are ideal for bundling, promotions, and stock prioritization.
+- The analysis shows that sales exhibit strong seasonality, with revenue increasing steadily toward the end of the year and peaking during the final months. This pattern is consistent with heightened consumer demand during holiday and festive periods, indicating that seasonal factors play a significant role in overall business performance.
+- Product-level analysis reveals that a small group of products accounts for a disproportionately large share of total units sold. These high-frequency items form the core of the retailer’s sales volume and present opportunities for product bundling, targeted promotions, and inventory optimization.
+- Transaction-level analysis indicates that most customers purchase a small number of items per transaction, reflecting typical consumer buying behavior. However, a notable portion of transactions involves large quantities, highlighting the presence of bulk-buying customers, likely small businesses or retailers.
+- Customer profitability analysis shows that UK-based customers generate the highest revenue, and that a relatively small number of customers contribute a significant share of total sales. These high-value customers represent a critical segment for revenue stability and growth.
+
 
 ##Business Recommendations
 
